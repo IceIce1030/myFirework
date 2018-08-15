@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    *{
+      padding: 0;
+      margin: 0;
+    }
+    h1 {
+      text-align: center;
+    }
+    p{
+      padding: 5px 20px;
+    }
+    #stage {
+      display: block;
+      width: 800px;
+      height: 600px;
+      margin: 30px auto;
+      border: 1px solid;
+    }
+  </style>
+</head>
+<body>
+  <h1>發射角速度</h1>
+  <canvas id="stage" width="800" height="600"></canvas>
+  <script>
+    let canvas = document.querySelector('#stage')
+    let ctx = canvas.getContext('2d')
+    let time = 0
+    let balls = []
+    let mouse = { x: 400, y: 300 }
+
+    function motion(offset) {
+      balls.forEach((item, index) => {
+        item.position.x += item.velocity * Math.cos(item.angle) / 1000 * offset
+        item.position.y += item.velocity * Math.sin(item.angle) / 1000 * offset
+        if (item.position.x < 0 || item.position.x > 800 || item.position.y < 0 || item.position.y > 600) {
+          item.active = false
+        }
+
+        if (item.active) {
+          ctx.fillStyle = 'black'
+          ctx.beginPath()
+          ctx.arc(item.position.x, item.position.y, item.radius, 0, Math.PI * 2)
+          ctx.fill()
+        } else {
+          console.log('delete')
+          delete balls.splice(index, 1)
+        }
+      })
+
+    }
+
+    function render(t) {
+      // console.log(t - time) // 間隔
+      // ctx.clearRect(0, 0, 800, 600)
+      canvas.width = canvas.width
+      motion(t - time)
+      time = t
+      // setTimeout(render, 1000 / 60)
+      ctx.moveTo(400, 300)
+      ctx.lineTo(mouse.x, mouse.y)
+      ctx.stroke()
+      requestAnimationFrame(render)
+    }
+
+    // setInterval(render, 1000 / 60) // 60 FPS
+    // setTimeout(render, 1000 / 60)
+    requestAnimationFrame(render)
+
+    canvas.addEventListener('mousemove', function (e) {
+      mouse = { x: e.offsetX, y: e.offsetY }
+    })
+
+    canvas.addEventListener('click', function (e) {
+      mouse = { x: e.offsetX, y: e.offsetY }
+
+      let mx = mouse.x - 400 // 鄰邊
+      let my = mouse.y - 300 // 對邊
+      // 斜邊 = Math.sqrt(mx * mx + my * my)
+
+      let ball = {
+        active: true,
+        angle: Math.atan(my / mx),
+        position: {
+          x: 400,
+          y: 300
+        },
+        velocity: 300,
+        radius: 10
+      }
+
+      if (mx < 0) {
+        ball.velocity *= -1
+      }
+
+      balls.push(ball)
+
+
+    })
+  </script>
+</body>
+</html>

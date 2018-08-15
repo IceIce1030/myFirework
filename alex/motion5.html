@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    *{
+      padding: 0;
+      margin: 0;
+    }
+    h1 {
+      text-align: center;
+    }
+    p{
+      padding: 5px 20px;
+    }
+    #stage {
+      display: block;
+      width: 800px;
+      height: 600px;
+      margin: 30px auto;
+      border: 1px solid;
+    }
+  </style>
+</head>
+<body>
+  <h1>隨機運動</h1>
+  <h1>布朗運動</h1>
+  <canvas id="stage" width="800" height="600"></canvas>
+  <script>
+    let canvas = document.querySelector('#stage')
+    let ctx = canvas.getContext('2d')
+    let time = 0
+
+    let ball = {
+      position: {
+        x: 400,
+        y: 300
+      },
+      radius: 10,
+      velocity: {
+        x: 0,
+        y: 0
+      },
+      acceleration: {
+        x: 0,
+        y: 0
+      }
+    }
+
+    function motion(offset) {
+      ball.acceleration = { x: Math.random() * 10 - 5, y: Math.random() * 10 - 5 }
+      ball.velocity.x += ball.acceleration.x
+      ball.position.x += ball.velocity.x / 1000 * offset
+      ball.velocity.y += ball.acceleration.y
+      ball.position.y += ball.velocity.y / 1000 * offset
+
+      if (ball.position.x > 800) {
+        ball.position.x = 0
+      } else if (ball.position.x < 0) {
+        ball.position.x = 800
+      }
+      if (ball.position.y > 600) {
+        ball.position.y = 0
+      } else if (ball.position.y < 0) {
+        ball.position.y = 600
+      }
+    }
+
+    function draw() {
+      ctx.fillStyle = 'black'
+      ctx.beginPath()
+      ctx.arc(ball.position.x, ball.position.y, ball.radius, 0, Math.PI * 2)
+      ctx.fill()
+    }
+
+    function render(t) {
+      // console.log(t - time) // 間隔
+      // ctx.clearRect(0, 0, 800, 600)
+      canvas.width = canvas.width
+      motion(t - time)
+      draw()
+      time = t
+      // setTimeout(render, 1000 / 60)
+      requestAnimationFrame(render)
+    }
+
+    // setInterval(render, 1000 / 60) // 60 FPS
+    // setTimeout(render, 1000 / 60)
+    requestAnimationFrame(render)
+  </script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    *{
+      padding: 0;
+      margin: 0;
+    }
+    h1 {
+      text-align: center;
+    }
+    p{
+      padding: 5px 20px;
+    }
+    #stage {
+      display: block;
+      width: 800px;
+      height: 600px;
+      margin: 30px auto;
+      border: 1px solid;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="stage" width="800" height="600"></canvas>
+<script>
+  let canvas = document.querySelector("#stage")
+  let ctx = canvas.getContext('2d')
+  let time = 0;
+  let balls = []
+  let mouse = { x: 400, y: 300 } // 滑鼠座標
+  
+
+
+  // let ball = {
+  //   position: {
+  //     x: 0, // x 座標
+  //     y: 300 // y 座標
+  //   },
+  //   radius: 10, // 半徑
+  //   velocity: 100 // 速度
+  // }
+
+  function motion(offset) {
+    balls.forEach((ball, index) => {
+
+      ball.life-- // 動畫做一次，生命少一次
+      if(ball.life){
+        // 還在生命週期內，做動畫
+        ball.velocity.x += ball.acceleration.x
+        ball.position.x += ball.velocity.x / 1000 * offset
+        ball.acceleration.y += 1
+        ball.velocity.y += ball.acceleration.y
+        ball.position.y += ball.velocity.y / 1000 * offset
+
+        ctx.fillStyle = ball.color
+        ctx.beginPath()
+        ctx.arc(ball.position.x, ball.position.y, ball.radius, 0 ,Math.PI * 2)
+        // arc => (x座標, y座標, 半徑, 幾度開始畫, 要畫幾度) 弧度請用 Math.PI  不要用 0 - 360
+        ctx.fill()
+      } else{
+        // 球的結束生命週期，會收刪除
+        delete balls.splice(index, 1)
+      }
+    })
+  }
+
+  function render(t) {
+    // 做動畫前，清除畫面
+    // ctx.clearRect(0, 0 ,800, 600)
+    canvas.width = canvas.width
+    
+    motion(t - time)
+    time = t
+
+    requestAnimationFrame(render)
+  }
+  requestAnimationFrame(render)
+
+  canvas.addEventListener('mousemove', function(e){
+    // 每次一棟都要記錄x  y 座標
+    mouse = {x: e.offsetX, y: e.offsetY}
+  })
+
+  canvas.addEventListener('click', function(e){
+    // 記錄 x y 座標
+    mouse = { x: e.offsetX, y: e.offsetY }
+    
+    let angle
+    let color = '#' + parseInt(( Math.random() * 256 * 256 * 256 -1)).toString(16)
+    for ( let i = 0 ; i < 100 ; i++ ) {
+      angle = Math.random() * Math.PI * 2
+      balls.push({
+        life: 100, // 可以做100次，更新完就消失
+        position: {
+          x: mouse.x,
+          y: mouse.y,
+        },
+        velocity: {
+          x: 0, // 速度一開始都是 0，主要靠加速度
+          y: 0,
+        },
+        acceleration:{
+          x: Math.cos(angle) * (Math.random() * 10 - 10), // 取得 x 軸，乘以隨機的速度
+          y: Math.sin(angle) * (Math.random() * 10 - 10), // 取得 y 軸，乘以隨機的速度
+        },
+        radius: 5, // 半徑
+        color: color, // 顏色
+
+      })
+    }
+
+    
+
+  })
+</script>
+</body>
+</html>
